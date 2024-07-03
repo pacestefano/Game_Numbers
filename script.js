@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.addEventListener('dragstart', dragStart);
         cell.addEventListener('dragover', dragOver);
         cell.addEventListener('drop', drop);
+        cell.addEventListener('touchstart', touchStart, { passive: false });
+        cell.addEventListener('touchmove', touchMove, { passive: false });
+        cell.addEventListener('touchend', touchEnd, { passive: false });
         board.appendChild(cell);
     }
 
@@ -108,6 +111,54 @@ document.addEventListener('DOMContentLoaded', () => {
             moveCounter.textContent = `Mosse: ${moveCount}`;
         }
         checkWin();
+    }
+
+    function touchStart(e) {
+        if (!timerStarted) {
+            timerStarted = true;
+            instructions.style.display = 'none';
+        }
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target.classList.contains('cell')) {
+            e.target.classList.add('dragging');
+            e.target.dataset.draggingIndex = e.target.dataset.index;
+        }
+        e.preventDefault();
+    }
+
+    function touchMove(e) {
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        const draggingElement = document.querySelector('.dragging');
+        if (draggingElement && target && target.classList.contains('cell')) {
+            if (target !== draggingElement) {
+                const targetIndex = target.dataset.index;
+                const sourceIndex = draggingElement.dataset.draggingIndex;
+                const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
+                
+                // Swap the content of the source cell and target cell
+                [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
+                
+                draggingElement.classList.remove('dragging');
+                draggingElement.removeAttribute('data-dragging-index');
+                
+                // Increment move count and update display
+                moveCount++;
+                moveCounter.textContent = `Mosse: ${moveCount}`;
+                checkWin();
+            }
+        }
+        e.preventDefault();
+    }
+
+    function touchEnd(e) {
+        const draggingElement = document.querySelector('.dragging');
+        if (draggingElement) {
+            draggingElement.classList.remove('dragging');
+            draggingElement.removeAttribute('data-dragging-index');
+        }
+        e.preventDefault();
     }
 
     function checkWin() {
