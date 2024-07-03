@@ -49,6 +49,7 @@
             grid-template-columns: 70px 20px 70px 20px 70px;
             grid-template-rows: repeat(3, 70px);
             gap: 5px;
+            transition: background-color 1s ease;
         }
         .cell, .operator {
             display: flex;
@@ -79,6 +80,10 @@
             background-color: #ffeb3b !important;
             transition: background-color 1s ease;
         }
+        .win-animation {
+            background-color: green !important;
+            transition: background-color 1s ease;
+        }
         .message {
             margin-top: 20px;
             font-size: 20px;
@@ -102,6 +107,16 @@
         th {
             background-color: #f2f2f2;
         }
+        .next-game-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #76c7c0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +132,7 @@
         <!-- Layout modificato con operatori + e = -->
     </div>
     <div class="message" id="message"></div>
+    <button class="next-game-button" id="nextGameButton" onclick="startGame()">Prossima partita</button>
     <div class="summary" id="summary"></div>
     <script src="script.js"></script>
 </body>
