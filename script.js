@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('gameBoard');
-    const moveCounter = document.getElementById('moveCounter');
     const timerBar = document.getElementById('timerBar');
     const timerText = document.getElementById('timerText');
     const minMovesBar = document.getElementById('minMovesBar');
@@ -24,9 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_GAMES = 3;
 
     function startGame() {
+        console.log("Starting game..."); // Debug
         moveCount = 0;
         message.textContent = '';
-        moveCounter.textContent = `Mosse: ${moveCount}`;
         summary.textContent = '';
         nextGameButton.style.display = 'none';
         board.innerHTML = '';
@@ -38,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
+        console.log("Generated numbers:", numbers); // Debug
 
         // Calculate the minimum moves needed to solve the puzzle
         const minMoves = calculateMinMoves(shuffledNumbers);
@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             createOperator('=');
             createCell(shuffledNumbers[i * 3 + 2]);
         }
+        console.log("Grid populated"); // Debug
 
         startTimer();
         setTimeout(() => {
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 numbers.push(A, B, C);
             }
         }
+        console.log("Generated numbers:", numbers); // Debug
         return numbers.slice(0, 9);
     }
 
@@ -83,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createCell(num) {
         let cell = document.createElement('div');
+        console.log("Creating cell with number:", num); // Debug
         cell.classList.add('cell');
         cell.textContent = num;
         cell.draggable = true;
@@ -144,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Increment move count and update display
             moveCount++;
-            moveCounter.textContent = `Mosse: ${moveCount}`;
             movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
 
             // Remove dragging class
@@ -202,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Increment move count and update display
                 moveCount++;
-                moveCounter.textContent = `Mosse: ${moveCount}`;
                 movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
 
                 // Remove drop target class
