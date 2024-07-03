@@ -2,17 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('gameBoard');
     const moveCounter = document.getElementById('moveCounter');
     const timerBar = document.getElementById('timerBar');
+    const timerText = document.getElementById('timerText');
+    const minMovesBar = document.getElementById('minMovesBar');
+    const movesBar = document.getElementById('movesBar');
     const minMovesCounter = document.getElementById('minMovesCounter');
     const message = document.getElementById('message');
     const summary = document.getElementById('summary');
     const instructions = document.getElementById('instructions');
     const nextGameButton = document.getElementById('nextGameButton');
+    const moveSound = document.getElementById('moveSound');
+    const winSound = document.getElementById('winSound');
+    const timeoutSound = document.getElementById('timeoutSound');
     let moveCount = 0;
     let timerInterval;
     let gameIndex = 0;
     let gamesData = [];
     let timerStarted = false;
     let draggedElement = null;
+    let totalMoves;
 
     const MAX_GAMES = 3;
 
@@ -24,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
         nextGameButton.style.display = 'none';
         board.innerHTML = '';
         board.classList.remove('win-animation');
+        timerText.textContent = '120';
+        timerBar.style.width = '100%';
+        movesBar.style.width = '0%';
+        minMovesBar.style.width = '0%';
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
@@ -31,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Calculate the minimum moves needed to solve the puzzle
         const minMoves = calculateMinMoves(shuffledNumbers);
         minMovesCounter.textContent = `Mosse necessarie per risolvere il puzzle: ${minMoves}`;
+        totalMoves = minMoves;
+        minMovesBar.style.width = `${(minMoves / totalMoves) * 100}%`;
 
         // Create the grid cells with operators
         for (let i = 0; i < 3; i++) {
@@ -132,9 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Increment move count and update display
             moveCount++;
             moveCounter.textContent = `Mosse: ${moveCount}`;
+            movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
 
             // Remove dragging class
             sourceCell.classList.remove('dragging');
+
+            // Play move sound
+            moveSound.play();
         }
         checkWin();
     }
@@ -186,9 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Increment move count and update display
                 moveCount++;
                 moveCounter.textContent = `Mosse: ${moveCount}`;
+                movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
 
                 // Remove drop target class
                 target.classList.remove('drop-target');
+
+                // Play move sound
+                moveSound.play();
+
                 checkWin();
             }
         }
@@ -232,10 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextGameButton.style.display = 'block';
             }, 1000);
 
+            // Play win sound
+            winSound.play();
+
             gamesData.push({
                 minMoves: parseInt(minMovesCounter.textContent.match(/\d+/)[0]),
                 actualMoves: moveCount,
-                timeSpent: 120 - (parseInt(timerBar.style.width) * 120 / 100)
+                timeSpent: 120 - parseInt(timerText.textContent)
             });
 
             gameIndex++;
@@ -252,12 +277,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         timerInterval = setInterval(() => {
             timeRemaining--;
-            let progress = (120 - timeRemaining) / 120 * 100;
+            let progress = (timeRemaining / 120) * 100;
             timerBar.style.width = `${progress}%`;
+            timerText.textContent = timeRemaining;
 
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
                 alert('Tempo scaduto!');
+
+                // Play timeout sound
+                timeoutSound.play();
             }
         }, 1000);
     }
@@ -307,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${index + 1}</td>
                     <td>${game.minMoves}</td>
                     <td>${game.actualMoves}</td>
-                    <td>${game.timeSpent.toFixed(1)}</td>
+                    <td>${game.timeSpent}</td>
                 </tr>
             `;
         });
