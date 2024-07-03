@@ -57,6 +57,7 @@
             border: 1px solid #000;
             font-size: 24px;
             user-select: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
         .operator {
             background-color: transparent;
@@ -64,6 +65,13 @@
         }
         .correct {
             background-color: lightgreen;
+        }
+        .dragging {
+            background-color: #ffeb3b;
+            box-shadow: 0 0 10px #ffeb3b;
+        }
+        .drop-target {
+            background-color: #d3d3d3;
         }
         .message {
             margin-top: 20px;
