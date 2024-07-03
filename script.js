@@ -12,6 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const moveSound = document.getElementById('moveSound');
     const winSound = document.getElementById('winSound');
     const timeoutSound = document.getElementById('timeoutSound');
+
+    // Verifica che tutti gli elementi siano correttamente trovati
+    console.log({
+        board, timerBar, timerText, minMovesBar, movesBar, 
+        minMovesCounter, message, summary, instructions, nextGameButton
+    });
+
     let moveCount = 0;
     let timerInterval;
     let gameIndex = 0;
@@ -25,15 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame() {
         console.log("Starting game..."); // Debug
         moveCount = 0;
-        message.textContent = '';
-        summary.textContent = '';
-        nextGameButton.style.display = 'none';
-        board.innerHTML = '';
-        board.classList.remove('win-animation');
-        timerText.textContent = '120';
-        timerBar.style.width = '100%';
-        movesBar.style.width = '0%';
-        minMovesBar.style.width = '0%';
+        if (message) message.textContent = '';
+        if (summary) summary.textContent = '';
+        if (nextGameButton) nextGameButton.style.display = 'none';
+        if (board) {
+            board.innerHTML = '';
+            board.classList.remove('win-animation');
+        }
+        if (timerText) timerText.textContent = '120';
+        if (timerBar) timerBar.style.width = '100%';
+        if (movesBar) movesBar.style.width = '0%';
+        if (minMovesBar) minMovesBar.style.width = '0%';
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
@@ -41,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calculate the minimum moves needed to solve the puzzle
         const minMoves = calculateMinMoves(shuffledNumbers);
-        minMovesCounter.textContent = `Mosse necessarie per risolvere il puzzle: ${minMoves}`;
+        if (minMovesCounter) minMovesCounter.textContent = `Mosse necessarie per risolvere il puzzle: ${minMoves}`;
         totalMoves = minMoves;
-        minMovesBar.style.width = `${(minMoves / totalMoves) * 100}%`;
+        if (minMovesBar) minMovesBar.style.width = `${(minMoves / totalMoves) * 100}%`;
 
         // Create the grid cells with operators
         for (let i = 0; i < 3; i++) {
@@ -57,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         startTimer();
         setTimeout(() => {
-            instructions.style.opacity = 0;
+            if (instructions) instructions.style.opacity = 0;
         }, 10000); // Il testo scompare dopo 10 secondi
     }
 
@@ -97,14 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.addEventListener('touchstart', touchStart, { passive: false });
         cell.addEventListener('touchmove', touchMove, { passive: false });
         cell.addEventListener('touchend', touchEnd, { passive: false });
-        board.appendChild(cell);
+        if (board) board.appendChild(cell);
     }
 
     function createOperator(operator) {
         let operatorCell = document.createElement('div');
         operatorCell.classList.add('operator');
         operatorCell.textContent = operator;
-        board.appendChild(operatorCell);
+        if (board) board.appendChild(operatorCell);
     }
 
     function dragStart(e) {
@@ -248,11 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (correct) {
             clearInterval(timerInterval);
-            message.textContent = 'Puzzle Risolto';
+            if (message) message.textContent = 'Puzzle Risolto';
             board.classList.add('win-animation');
             setTimeout(() => {
                 board.classList.remove('win-animation');
-                nextGameButton.style.display = 'block';
+                if (nextGameButton) nextGameButton.style.display = 'block';
             }, 1000);
 
             // Play win sound
@@ -279,8 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timerInterval = setInterval(() => {
             timeRemaining--;
             let progress = (timeRemaining / 120) * 100;
-            timerBar.style.width = `${progress}%`;
-            timerText.textContent = timeRemaining;
+            if (timerBar) timerBar.style.width = `${progress}%`;
+            if (timerText) timerText.textContent = timeRemaining;
 
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
@@ -346,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tbody>
             </table>
         `;
-        summary.innerHTML = summaryHtml;
+        if (summary) summary.innerHTML = summaryHtml;
     }
 
     // Disable scrolling on touch devices
