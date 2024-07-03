@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cell.dataset.index = board.childElementCount;
         cell.addEventListener('dragstart', dragStart);
         cell.addEventListener('dragover', dragOver);
+        cell.addEventListener('dragleave', dragLeave);
         cell.addEventListener('drop', drop);
         cell.addEventListener('touchstart', touchStart, { passive: false });
         cell.addEventListener('touchmove', touchMove, { passive: false });
@@ -86,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function dragStart(e) {
         e.dataTransfer.setData('text/plain', e.target.dataset.index);
+        e.target.classList.add('dragging');
         if (!timerStarted) {
             timerStarted = true;
             instructions.style.display = 'none';
@@ -94,10 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function dragOver(e) {
         e.preventDefault();
+        e.target.classList.add('drop-target');
+    }
+
+    function dragLeave(e) {
+        e.target.classList.remove('drop-target');
     }
 
     function drop(e) {
         e.preventDefault();
+        e.target.classList.remove('drop-target');
         const sourceIndex = e.dataTransfer.getData('text/plain');
         const target = e.target;
         if (target.classList.contains('cell')) {
@@ -110,6 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Increment move count and update display
             moveCount++;
             moveCounter.textContent = `Mosse: ${moveCount}`;
+
+            // Remove dragging class
+            sourceCell.classList.remove('dragging');
         }
         checkWin();
     }
@@ -128,6 +139,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function touchMove(e) {
         e.preventDefault();
+        const touch = e.touches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.classList.contains('cell') && target !== draggedElement) {
+            target.classList.add('drop-target');
+        }
     }
 
     function touchEnd(e) {
@@ -148,6 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Increment move count and update display
                 moveCount++;
                 moveCounter.textContent = `Mosse: ${moveCount}`;
+
+                // Remove drop target class
+                target.classList.remove('drop-target');
                 checkWin();
             }
         }
