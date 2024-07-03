@@ -141,6 +141,9 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        #minMovesCounter { /* Aggiunta questa regola per garantire che l'elemento esista */
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -166,6 +169,7 @@
             <div class="bar-inner moves" id="movesBar"></div>
         </div>
     </div>
+    <div id="minMovesCounter">Mosse necessarie per risolvere il puzzle: </div> <!-- Aggiunto l'elemento mancante -->
     <div class="grid" id="gameBoard">
         <!-- Layout modificato con operatori + e = -->
     </div>
