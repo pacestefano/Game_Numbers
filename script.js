@@ -115,6 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Swap the content of the source cell and target cell
             [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
 
+            // Highlight source and target cells
+            sourceCell.classList.add('highlight');
+            target.classList.add('highlight');
+
+            setTimeout(() => {
+                sourceCell.classList.remove('highlight');
+                target.classList.remove('highlight');
+            }, 500);
+
             // Increment move count and update display
             moveCount++;
             moveCounter.textContent = `Mosse: ${moveCount}`;
@@ -157,6 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Swap the content of the source cell and target cell
                 [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
+
+                // Highlight source and target cells
+                sourceCell.classList.add('highlight');
+                target.classList.add('highlight');
+
+                setTimeout(() => {
+                    sourceCell.classList.remove('highlight');
+                    target.classList.remove('highlight');
+                }, 500);
 
                 draggedElement.classList.remove('dragging');
                 draggedElement.removeAttribute('data-dragging-index');
@@ -235,67 +253,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function calculateMinMoves(arr) {
-        const sorted = [...arr].sort((a, b) => a - b);
-        let moves = 0;
-        const visited = new Array(arr.length).fill(false);
-
-        for (let i = 0; i < arr.length; i++) {
-            if (visited[i] || sorted[i] === arr[i]) continue;
-
-            let cycleSize = 0;
-            let x = i;
-            while (!visited[x]) {
-                visited[x] = true;
-                x = arr.indexOf(sorted[x]);
-                cycleSize++;
-            }
-
-            if (cycleSize > 0) {
-                moves += (cycleSize - 1);
-            }
-        }
-
-        return moves;
-    }
-
-    function showSummary() {
-        let summaryHtml = `
-            <h3>Riepilogo delle Partite</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Partita</th>
-                        <th>Mosse Minime Necessarie</th>
-                        <th>Mosse Effettive</th>
-                        <th>Tempo Impiegato (secondi)</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        gamesData.forEach((game, index) => {
-            summaryHtml += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${game.minMoves}</td>
-                    <td>${game.actualMoves}</td>
-                    <td>${game.timeSpent.toFixed(1)}</td>
-                </tr>
-            `;
-        });
-
-        summaryHtml += `
-                </tbody>
-            </table>
-        `;
-        summary.innerHTML = summaryHtml;
-    }
-
-    // Disable scrolling on touch devices
-    document.body.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-    }, { passive: false });
-
-    // Start the first game
-    startGame();
-});
+        const sorted = [...arr].sort((a, b) => a
