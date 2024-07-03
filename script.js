@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById('message');
     const summary = document.getElementById('summary');
     const instructions = document.getElementById('instructions');
+    const nextGameButton = document.getElementById('nextGameButton');
     let moveCount = 0;
     let timerInterval;
     let gameIndex = 0;
@@ -20,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
         message.textContent = '';
         moveCounter.textContent = `Mosse: ${moveCount}`;
         summary.textContent = '';
+        nextGameButton.style.display = 'none';
         board.innerHTML = '';
+        board.classList.remove('win-animation');
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
@@ -223,6 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (correct) {
             clearInterval(timerInterval);
             message.textContent = 'Puzzle Risolto';
+            board.classList.add('win-animation');
+            setTimeout(() => {
+                board.classList.remove('win-animation');
+                nextGameButton.style.display = 'block';
+            }, 1000);
+
             gamesData.push({
                 minMoves: parseInt(minMovesCounter.textContent.match(/\d+/)[0]),
                 actualMoves: moveCount,
@@ -239,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startTimer() {
-        let timeRemaining = 120; // 2 minutes in seconds
+        let timeRemaining = 120; // 2 minuti in secondi
 
         timerInterval = setInterval(() => {
             timeRemaining--;
