@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameIndex = 0;
     let gamesData = [];
     let timerStarted = false;
+    let draggedElement = null;
 
     const MAX_GAMES = 3;
 
@@ -119,44 +120,41 @@ document.addEventListener('DOMContentLoaded', () => {
             instructions.style.display = 'none';
         }
         const touch = e.touches[0];
-        const target = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (target.classList.contains('cell')) {
-            e.target.classList.add('dragging');
-            e.target.dataset.draggingIndex = e.target.dataset.index;
-        }
+        draggedElement = e.target;
+        draggedElement.classList.add('dragging');
+        draggedElement.dataset.draggingIndex = draggedElement.dataset.index;
         e.preventDefault();
     }
 
     function touchMove(e) {
-        const touch = e.touches[0];
+        e.preventDefault();
+    }
+
+    function touchEnd(e) {
+        const touch = e.changedTouches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
-        const draggingElement = document.querySelector('.dragging');
-        if (draggingElement && target && target.classList.contains('cell')) {
-            if (target !== draggingElement) {
+        if (draggedElement && target && target.classList.contains('cell')) {
+            if (target !== draggedElement) {
                 const targetIndex = target.dataset.index;
-                const sourceIndex = draggingElement.dataset.draggingIndex;
+                const sourceIndex = draggedElement.dataset.draggingIndex;
                 const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
-                
+
                 // Swap the content of the source cell and target cell
                 [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
-                
-                draggingElement.classList.remove('dragging');
-                draggingElement.removeAttribute('data-dragging-index');
-                
+
+                draggedElement.classList.remove('dragging');
+                draggedElement.removeAttribute('data-dragging-index');
+
                 // Increment move count and update display
                 moveCount++;
                 moveCounter.textContent = `Mosse: ${moveCount}`;
                 checkWin();
             }
         }
-        e.preventDefault();
-    }
-
-    function touchEnd(e) {
-        const draggingElement = document.querySelector('.dragging');
-        if (draggingElement) {
-            draggingElement.classList.remove('dragging');
-            draggingElement.removeAttribute('data-dragging-index');
+        if (draggedElement) {
+            draggedElement.classList.remove('dragging');
+            draggedElement.removeAttribute('data-dragging-index');
+            draggedElement = null;
         }
         e.preventDefault();
     }
