@@ -27,22 +27,45 @@
             border-radius: 10px;
             transition: opacity 1s ease;
         }
-        .timer-bar-container {
+        .bar-container {
             width: 90%;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .bar-label {
+            width: 30%;
+            text-align: right;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        .bar {
+            flex-grow: 1;
             background-color: #ddd;
             border: 1px solid #000;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 20px;
+            position: relative;
         }
-        .timer-bar {
+        .bar-inner {
             height: 20px;
             background-color: #76c7c0;
             width: 0%;
         }
-        .move-counter, .min-moves-counter {
-            margin-bottom: 10px;
-            font-size: 18px; /* Ridotto da 20px a 18px */
+        .bar-inner.moves {
+            background-color: #ffeb3b;
+        }
+        .bar-inner.min-moves {
+            background-color: #4caf50;
+        }
+        .timer-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 0;
+            left: 0;
+            font-size: 14px;
+            line-height: 20px;
         }
         .grid {
             display: grid;
@@ -124,11 +147,25 @@
     <div class="instructions" id="instructions">
         Obiettivo del gioco è disporre i numeri sulla scacchiera in modo che le operazioni aritmetiche mostrate sulla scacchiera siano corrette.
     </div>
-    <div class="timer-bar-container">
-        <div class="timer-bar" id="timerBar"></div>
+    <div class="bar-container">
+        <div class="bar-label">Tempo massimo</div>
+        <div class="bar">
+            <div class="bar-inner" id="timerBar"></div>
+            <div class="timer-text" id="timerText">120</div>
+        </div>
     </div>
-    <div class="move-counter" id="moveCounter">Mosse: 0</div>
-    <div class="min-moves-counter" id="minMovesCounter">Mosse necessarie per risolvere il puzzle: </div>
+    <div class="bar-container">
+        <div class="bar-label">Numero minimo di mosse per la soluzione</div>
+        <div class="bar">
+            <div class="bar-inner min-moves" id="minMovesBar"></div>
+        </div>
+    </div>
+    <div class="bar-container">
+        <div class="bar-label">Numero di mosse eseguite</div>
+        <div class="bar">
+            <div class="bar-inner moves" id="movesBar"></div>
+        </div>
+    </div>
     <div class="grid" id="gameBoard">
         <!-- Layout modificato con operatori + e = -->
     </div>
