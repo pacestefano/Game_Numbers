@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         startTimer();
+        setTimeout(() => {
+            instructions.style.opacity = 0;
+        }, 10000); // Il testo scompare dopo 10 secondi
     }
 
     function generateNumbers() {
@@ -90,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.target.classList.add('dragging');
         if (!timerStarted) {
             timerStarted = true;
-            instructions.style.display = 'none';
         }
     }
 
@@ -137,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function touchStart(e) {
         if (!timerStarted) {
             timerStarted = true;
-            instructions.style.display = 'none';
         }
         const touch = e.touches[0];
         draggedElement = e.target;
