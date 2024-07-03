@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             draggedElement.removeAttribute('data-dragging-index');
             draggedElement = null;
         }
+        document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
         e.preventDefault();
     }
 
