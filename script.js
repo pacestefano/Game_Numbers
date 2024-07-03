@@ -273,6 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
         summary.innerHTML = summaryHtml;
     }
 
+    // Disable scrolling on touch devices
+    document.body.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
     // Start the first game
     startGame();
 });
