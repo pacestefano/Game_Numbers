@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let draggedElement = null;
     let totalMoves;
     let moveHistory = [];
+    let gameOver = false; // Variabile per tracciare se il gioco è terminato
 
     const MAX_GAMES = 3;
 
@@ -31,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Starting game..."); // Debug
         moveCount = 0;
         moveHistory = [];
+        gameOver = false;
         if (message) message.textContent = '';
         if (summary) summary.textContent = '';
         if (nextGameButton) nextGameButton.style.display = 'none';
@@ -125,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function dragStart(e) {
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         e.dataTransfer.setData('text/plain', e.target.dataset.index);
         e.target.classList.add('dragging');
         if (!timerStarted) {
@@ -140,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function dragOver(e) {
         e.preventDefault();
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         e.target.classList.add('drop-target');
     }
 
@@ -149,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drop(e) {
         e.preventDefault();
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         e.target.classList.remove('drop-target');
         const sourceIndex = e.dataTransfer.getData('text/plain');
         const target = e.target;
@@ -188,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function touchStart(e) {
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         if (!timerStarted) {
             timerStarted = true;
         }
@@ -206,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function touchMove(e) {
         e.preventDefault();
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         const touch = e.touches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
         if (target && target.classList.contains('cell') && target !== draggedElement) {
@@ -216,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function touchEnd(e) {
         const touch = e.changedTouches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
         if (draggedElement && target && target.classList.contains('cell')) {
             if (target !== draggedElement) {
                 const targetIndex = target.dataset.index;
@@ -293,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove the error message if present
         if (message && moveCount <= totalMoves) {
             message.textContent = '';
+            gameOver = false; // Permette ulteriori mosse
         }
     }
 
@@ -343,11 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     showSummary();
                 }
-            } else {
-                // Se il giocatore ha superato il numero minimo di mosse, partita persa
-                if (message) message.textContent = 'Numero massimo di mosse superato. Annulla le ultime mosse e riprova.';
-                loseSound.play(); // Suono per partita persa
             }
+        } else if (!isUndo && moveCount > totalMoves) {
+            // Se il giocatore ha superato il numero minimo di mosse, partita persa
+            gameOver = true; // Impedisce ulteriori mosse
+            if (message) message.textContent = 'Numero massimo di mosse superato. Annulla le ultime mosse e riprova.';
+            loseSound.play(); // Suono per partita persa
         }
     }
 
