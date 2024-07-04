@@ -19,7 +19,7 @@
         .instructions {
             width: 90%;
             text-align: center;
-            font-size: 16px; /* Ridotto da 18px a 16px */
+            font-size: 16px;
             margin-bottom: 20px;
             padding: 10px;
             background-color: #fff8dc;
@@ -156,7 +156,23 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        #minMovesCounter { /* Aggiunta questa regola per garantire che l'elemento esista */
+        .retry-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px; /* Ridotto da 18px a 16px */
+            background-color: #f44336;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .timeout-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            color: red;
+        }
+        #minMovesCounter {
             margin-bottom: 20px;
         }
         .undo-button {
@@ -177,17 +193,17 @@
 </head>
 <body>
     <div class="instructions" id="instructions">
-        Obiettivo del gioco è disporre i numeri sulla scacchiera in modo che le N operazioni aritmetiche mostrate sulla scacchiera siano corrette.
+        Obiettivo del gioco è disporre i numeri sulla scacchiera in modo che le operazioni aritmetiche mostrate sulla scacchiera siano corrette.
     </div>
     <div class="bar-container">
-        <div class="bar-label">Tempo massimo disponibile</div>
+        <div class="bar-label">Tempo massimo disponibile per risolvere il puzzle</div>
         <div class="bar">
             <div class="bar-inner" id="timerBar"></div>
             <div class="timer-text" id="timerText">120 secondi</div>
         </div>
     </div>
     <div class="bar-container">
-        <div class="bar-label">Numero massimo di mosse a disponibili</div>
+        <div class="bar-label">Numero massimo di mosse a disposizione per risolvere il puzzle</div>
         <div class="circle-container" id="minMovesContainer"></div>
         <div class="circle-counter" id="minMovesCounter">0</div>
     </div>
@@ -200,7 +216,9 @@
         <!-- Layout modificato con operatori + e = -->
     </div>
     <div class="message" id="message"></div>
+    <div class="timeout-message" id="timeoutMessage">Tempo scaduto! Riprova con una nuova partita.</div>
     <button class="next-game-button" id="nextGameButton" onclick="startGame()">Prossima partita</button>
+    <button class="retry-button" id="retryButton" onclick="startGame()">Riprova... avvia una nuova partita!</button>
     <button class="undo-button" id="undoButton" onclick="undoMove()">Annulla ultima mossa</button>
     <div class="summary" id="summary"></div>
 
@@ -208,7 +226,7 @@
     <audio id="moveSound" src="move.mp3" preload="auto"></audio>
     <audio id="winSound" src="win.mp3" preload="auto"></audio>
     <audio id="timeoutSound" src="timeout.mp3" preload="auto"></audio>
-    <audio id="loseSound" src="lose.mp3" preload="auto"></audio> <!-- Aggiunta l'effetto sonoro per la partita persa -->
+    <audio id="loseSound" src="lose.mp3" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>
