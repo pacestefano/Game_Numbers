@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const summary = document.getElementById('summary');
     const instructions = document.getElementById('instructions');
     const nextGameButton = document.getElementById('nextGameButton');
+    const retryButton = document.getElementById('retryButton');
+    const timeoutMessage = document.getElementById('timeoutMessage');
     const moveSound = document.getElementById('moveSound');
     const winSound = document.getElementById('winSound');
     const timeoutSound = document.getElementById('timeoutSound');
@@ -34,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
         moveHistory = [];
         gameOver = false;
         if (message) message.textContent = '';
+        if (timeoutMessage) timeoutMessage.style.display = 'none';
+        if (retryButton) retryButton.style.display = 'none';
         if (summary) summary.textContent = '';
         if (nextGameButton) nextGameButton.style.display = 'none';
         if (board) {
@@ -365,7 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
-                alert('Tempo scaduto!');
+                if (timeoutMessage) timeoutMessage.style.display = 'block';
+                if (retryButton) retryButton.style.display = 'block';
+                gameOver = true;
 
                 timeoutSound.play();
             }
