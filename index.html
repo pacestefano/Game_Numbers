@@ -25,7 +25,6 @@
             background-color: #fff8dc;
             border: 1px solid #000;
             border-radius: 10px;
-            transition: opacity 1s ease;
         }
         .bar-container {
             width: 90%;
@@ -39,33 +38,26 @@
             margin-right: 10px;
             font-size: 14px;
         }
-        .bar {
-            flex-grow: 1;
-            background-color: #ddd;
-            border: 1px solid #000;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
+        .circle-container {
+            display: flex;
+            align-items: center;
         }
-        .bar-inner {
+        .circle {
+            width: 20px;
             height: 20px;
-            background-color: #76c7c0;
-            width: 0%;
+            border-radius: 50%;
+            background-color: #4caf50;
+            margin-right: 5px;
         }
-        .bar-inner.moves {
+        .circle.moves {
             background-color: #ffeb3b;
         }
-        .bar-inner.min-moves {
+        .circle.min-moves {
             background-color: #4caf50;
         }
-        .timer-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            top: 0;
-            left: 0;
+        .circle-counter {
             font-size: 14px;
-            line-height: 20px;
+            margin-left: 10px;
         }
         .grid {
             display: grid;
@@ -100,7 +92,7 @@
             background-color: #d3d3d3;
         }
         .highlight {
-            background-color: #ffeb3b !important;
+            background-color: #d3d3d3 !important;
             transition: background-color 1s ease;
         }
         .win-animation {
@@ -159,17 +151,14 @@
     </div>
     <div class="bar-container">
         <div class="bar-label">Numero minimo di mosse per la soluzione</div>
-        <div class="bar">
-            <div class="bar-inner min-moves" id="minMovesBar"></div>
-        </div>
+        <div class="circle-container" id="minMovesContainer"></div>
+        <div class="circle-counter" id="minMovesCounter">0</div>
     </div>
     <div class="bar-container">
         <div class="bar-label">Numero di mosse eseguite</div>
-        <div class="bar">
-            <div class="bar-inner moves" id="movesBar"></div>
-        </div>
+        <div class="circle-container" id="movesContainer"></div>
+        <div class="circle-counter" id="movesCounter">0</div>
     </div>
-    <div id="minMovesCounter">Mosse necessarie per risolvere il puzzle: </div> <!-- Aggiunto l'elemento mancante -->
     <div class="grid" id="gameBoard">
         <!-- Layout modificato con operatori + e = -->
     </div>
