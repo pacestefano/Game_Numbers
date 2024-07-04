@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const moveSound = document.getElementById('moveSound');
     const winSound = document.getElementById('winSound');
     const timeoutSound = document.getElementById('timeoutSound');
+    const loseSound = document.getElementById('loseSound'); // Aggiunto il suono per la partita persa
+    const undoButton = document.getElementById('undoButton'); // Aggiunto il riferimento al pulsante Annulla
 
     let moveCount = 0;
     let timerInterval;
@@ -21,12 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerStarted = false;
     let draggedElement = null;
     let totalMoves;
+    let moveHistory = [];
 
     const MAX_GAMES = 3;
 
     function startGame() {
         console.log("Starting game..."); // Debug
         moveCount = 0;
+        moveHistory = [];
         if (message) message.textContent = '';
         if (summary) summary.textContent = '';
         if (nextGameButton) nextGameButton.style.display = 'none';
@@ -34,12 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
             board.innerHTML = '';
             board.classList.remove('win-animation');
         }
-        if (timerText) timerText.textContent = '120';
+        if (timerText) timerText.textContent = '120 secondi';
         if (timerBar) timerBar.style.width = '100%';
         if (movesContainer) movesContainer.innerHTML = '';
         if (minMovesContainer) minMovesContainer.innerHTML = '';
         if (movesCounter) movesCounter.textContent = '0';
         if (minMovesCounter) minMovesCounter.textContent = '0';
+
+        if (undoButton) {
+            undoButton.classList.remove('active');
+            undoButton.style.backgroundColor = '#d3d3d3';
+            undoButton.style.cursor = 'not-allowed';
+        }
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
@@ -120,6 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!timerStarted) {
             timerStarted = true;
         }
+
+        if (undoButton) {
+            undoButton.classList.add('active');
+            undoButton.style.backgroundColor = '#4caf50';
+            undoButton.style.cursor = 'pointer';
+        }
     }
 
     function dragOver(e) {
@@ -140,6 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetIndex = target.dataset.index;
             const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
             
+            // Save the current state before the move
+            saveMoveState();
+
             // Swap the content of the source cell and target cell
             [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
 
@@ -177,6 +196,12 @@ document.addEventListener('DOMContentLoaded', () => {
         draggedElement.classList.add('dragging');
         draggedElement.dataset.draggingIndex = draggedElement.dataset.index;
         e.preventDefault();
+
+        if (undoButton) {
+            undoButton.classList.add('active');
+            undoButton.style.backgroundColor = '#4caf50';
+            undoButton.style.cursor = 'pointer';
+        }
     }
 
     function touchMove(e) {
@@ -196,6 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetIndex = target.dataset.index;
                 const sourceIndex = draggedElement.dataset.draggingIndex;
                 const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
+
+                // Save the current state before the move
+                saveMoveState();
 
                 // Swap the content of the source cell and target cell
                 [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
@@ -237,7 +265,38 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
     }
 
-    function checkWin() {
+    function saveMoveState() {
+        const cells = Array.from(document.querySelectorAll('.cell')).map(cell => cell.textContent);
+        moveHistory.push({ cells, moveCount });
+    }
+
+    window.undoMove = function undoMove() {
+        if (moveHistory.length === 0) return;
+
+        const lastState = moveHistory.pop();
+        const cells = document.querySelectorAll('.cell');
+        lastState.cells.forEach((value, index) => {
+            cells[index].textContent = value;
+        });
+
+        moveCount = lastState.moveCount;
+        movesCounter.textContent = moveCount;
+
+        // Remove the last move indicator circle
+        if (movesContainer.lastChild) {
+            movesContainer.removeChild(movesContainer.lastChild);
+        }
+
+        // Check and update the visual status of the cells
+        checkWin(true); // Call checkWin with a parameter to indicate that this is an undo action
+
+        // Remove the error message if present
+        if (message && moveCount <= totalMoves) {
+            message.textContent = '';
+        }
+    }
+
+    function checkWin(isUndo = false) {
         const cells = document.querySelectorAll('.cell');
         const values = Array.from(cells).map(cell => parseInt(cell.textContent));
 
@@ -259,29 +318,35 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (correct) {
-            clearInterval(timerInterval);
-            if (message) message.textContent = 'Puzzle Risolto';
-            board.classList.add('win-animation');
-            setTimeout(() => {
-                board.classList.remove('win-animation');
-                if (nextGameButton) nextGameButton.style.display = 'block';
-            }, 1000);
+        if (correct && !isUndo) {
+            if (moveCount <= totalMoves) {
+                clearInterval(timerInterval);
+                if (message) message.textContent = 'Puzzle Risolto';
+                board.classList.add('win-animation');
+                setTimeout(() => {
+                    board.classList.remove('win-animation');
+                    if (nextGameButton) nextGameButton.style.display = 'block';
+                }, 1000);
 
-            // Play win sound
-            winSound.play();
+                // Play win sound
+                winSound.play();
 
-            gamesData.push({
-                minMoves: parseInt(minMovesCounter.textContent),
-                actualMoves: moveCount,
-                timeSpent: 120 - parseInt(timerText.textContent)
-            });
+                gamesData.push({
+                    minMoves: parseInt(minMovesCounter.textContent),
+                    actualMoves: moveCount,
+                    timeSpent: 120 - parseInt(timerText.textContent)
+                });
 
-            gameIndex++;
-            if (gameIndex < MAX_GAMES) {
-                setTimeout(startGame, 1000); // Start next game after 1 second
+                gameIndex++;
+                if (gameIndex < MAX_GAMES) {
+                    setTimeout(startGame, 1000); // Start next game after 1 second
+                } else {
+                    showSummary();
+                }
             } else {
-                showSummary();
+                // Se il giocatore ha superato il numero minimo di mosse, partita persa
+                if (message) message.textContent = 'Numero massimo di mosse superato. Annulla le ultime mosse e riprova.';
+                loseSound.play(); // Suono per partita persa
             }
         }
     }
@@ -293,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
             timeRemaining--;
             let progress = (timeRemaining / 120) * 100;
             if (timerBar) timerBar.style.width = `${progress}%`;
-            if (timerText) timerText.textContent = timeRemaining;
+            if (timerText) timerText.textContent = `${timeRemaining} secondi`;
 
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
