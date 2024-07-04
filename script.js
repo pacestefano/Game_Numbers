@@ -2,9 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('gameBoard');
     const timerBar = document.getElementById('timerBar');
     const timerText = document.getElementById('timerText');
-    const minMovesBar = document.getElementById('minMovesBar');
-    const movesBar = document.getElementById('movesBar');
+    const minMovesContainer = document.getElementById('minMovesContainer');
+    const movesContainer = document.getElementById('movesContainer');
     const minMovesCounter = document.getElementById('minMovesCounter');
+    const movesCounter = document.getElementById('movesCounter');
     const message = document.getElementById('message');
     const summary = document.getElementById('summary');
     const instructions = document.getElementById('instructions');
@@ -12,12 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const moveSound = document.getElementById('moveSound');
     const winSound = document.getElementById('winSound');
     const timeoutSound = document.getElementById('timeoutSound');
-
-    // Verifica che tutti gli elementi siano correttamente trovati
-    console.log({
-        board, timerBar, timerText, minMovesBar, movesBar, 
-        minMovesCounter, message, summary, instructions, nextGameButton
-    });
 
     let moveCount = 0;
     let timerInterval;
@@ -41,8 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (timerText) timerText.textContent = '120';
         if (timerBar) timerBar.style.width = '100%';
-        if (movesBar) movesBar.style.width = '0%';
-        if (minMovesBar) minMovesBar.style.width = '0%';
+        if (movesContainer) movesContainer.innerHTML = '';
+        if (minMovesContainer) minMovesContainer.innerHTML = '';
+        if (movesCounter) movesCounter.textContent = '0';
+        if (minMovesCounter) minMovesCounter.textContent = '0';
 
         let numbers = generateNumbers();
         let shuffledNumbers = shuffle(numbers);
@@ -50,9 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calculate the minimum moves needed to solve the puzzle
         const minMoves = calculateMinMoves(shuffledNumbers);
-        if (minMovesCounter) minMovesCounter.textContent = `Mosse necessarie per risolvere il puzzle: ${minMoves}`;
+        if (minMovesCounter) minMovesCounter.textContent = minMoves;
         totalMoves = minMoves;
-        if (minMovesBar) minMovesBar.style.width = `${(minMoves / totalMoves) * 100}%`;
+        for (let i = 0; i < minMoves; i++) {
+            let circle = document.createElement('div');
+            circle.classList.add('circle', 'min-moves');
+            minMovesContainer.appendChild(circle);
+        }
 
         // Create the grid cells with operators
         for (let i = 0; i < 3; i++) {
@@ -65,9 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Grid populated"); // Debug
 
         startTimer();
-        setTimeout(() => {
-            if (instructions) instructions.style.opacity = 0;
-        }, 10000); // Il testo scompare dopo 10 secondi
     }
 
     function generateNumbers() {
@@ -156,7 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Increment move count and update display
             moveCount++;
-            movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
+            movesCounter.textContent = moveCount;
+            let circle = document.createElement('div');
+            circle.classList.add('circle', 'moves');
+            movesContainer.appendChild(circle);
 
             // Remove dragging class
             sourceCell.classList.remove('dragging');
@@ -213,7 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Increment move count and update display
                 moveCount++;
-                movesBar.style.width = `${(moveCount / totalMoves) * 100}%`;
+                movesCounter.textContent = moveCount;
+                let circle = document.createElement('div');
+                circle.classList.add('circle', 'moves');
+                movesContainer.appendChild(circle);
 
                 // Remove drop target class
                 target.classList.remove('drop-target');
@@ -268,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             winSound.play();
 
             gamesData.push({
-                minMoves: parseInt(minMovesCounter.textContent.match(/\d+/)[0]),
+                minMoves: parseInt(minMovesCounter.textContent),
                 actualMoves: moveCount,
                 timeSpent: 120 - parseInt(timerText.textContent)
             });
