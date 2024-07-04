@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const moveSound = document.getElementById('moveSound');
     const winSound = document.getElementById('winSound');
     const timeoutSound = document.getElementById('timeoutSound');
-    const loseSound = document.getElementById('loseSound'); // Aggiunto il suono per la partita persa
-    const undoButton = document.getElementById('undoButton'); // Aggiunto il riferimento al pulsante Annulla
+    const loseSound = document.getElementById('loseSound');
+    const undoButton = document.getElementById('undoButton');
 
     let moveCount = 0;
     let timerInterval;
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let draggedElement = null;
     let totalMoves;
     let moveHistory = [];
-    let gameOver = false; // Variabile per tracciare se il gioco è terminato
+    let gameOver = false;
 
     const MAX_GAMES = 3;
 
@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let shuffledNumbers = shuffle(numbers);
         console.log("Generated numbers:", numbers); // Debug
 
-        // Calculate the minimum moves needed to solve the puzzle
         const minMoves = calculateMinMoves(shuffledNumbers);
         if (minMovesCounter) minMovesCounter.textContent = minMoves;
         totalMoves = minMoves;
@@ -67,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             minMovesContainer.appendChild(circle);
         }
 
-        // Create the grid cells with operators
         for (let i = 0; i < 3; i++) {
             createCell(shuffledNumbers[i * 3]);
             createOperator('+');
@@ -127,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function dragStart(e) {
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         e.dataTransfer.setData('text/plain', e.target.dataset.index);
         e.target.classList.add('dragging');
         if (!timerStarted) {
@@ -143,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function dragOver(e) {
         e.preventDefault();
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         e.target.classList.add('drop-target');
     }
 
@@ -153,21 +151,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drop(e) {
         e.preventDefault();
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         e.target.classList.remove('drop-target');
         const sourceIndex = e.dataTransfer.getData('text/plain');
         const target = e.target;
         if (target.classList.contains('cell')) {
             const targetIndex = target.dataset.index;
             const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
-            
-            // Save the current state before the move
+
             saveMoveState();
 
-            // Swap the content of the source cell and target cell
             [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
 
-            // Highlight source and target cells
             sourceCell.classList.add('highlight');
             target.classList.add('highlight');
 
@@ -176,24 +171,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 target.classList.remove('highlight');
             }, 1000);
 
-            // Increment move count and update display
             moveCount++;
             movesCounter.textContent = moveCount;
             let circle = document.createElement('div');
             circle.classList.add('circle', 'moves');
+            if (moveCount > totalMoves) {
+                circle.style.backgroundColor = 'red';
+            }
             movesContainer.appendChild(circle);
 
-            // Remove dragging class
             sourceCell.classList.remove('dragging');
 
-            // Play move sound
             moveSound.play();
         }
         checkWin();
     }
 
     function touchStart(e) {
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         if (!timerStarted) {
             timerStarted = true;
         }
@@ -212,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function touchMove(e) {
         e.preventDefault();
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         const touch = e.touches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
         if (target && target.classList.contains('cell') && target !== draggedElement) {
@@ -223,20 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function touchEnd(e) {
         const touch = e.changedTouches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (gameOver) return; // Blocca ulteriori mosse se il gioco è terminato
+        if (gameOver) return;
         if (draggedElement && target && target.classList.contains('cell')) {
             if (target !== draggedElement) {
                 const targetIndex = target.dataset.index;
                 const sourceIndex = draggedElement.dataset.draggingIndex;
                 const sourceCell = document.querySelector(`.cell[data-index='${sourceIndex}']`);
 
-                // Save the current state before the move
                 saveMoveState();
 
-                // Swap the content of the source cell and target cell
                 [sourceCell.textContent, target.textContent] = [target.textContent, sourceCell.textContent];
 
-                // Highlight source and target cells
                 sourceCell.classList.add('highlight');
                 target.classList.add('highlight');
 
@@ -248,17 +240,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 draggedElement.classList.remove('dragging');
                 draggedElement.removeAttribute('data-dragging-index');
 
-                // Increment move count and update display
                 moveCount++;
                 movesCounter.textContent = moveCount;
                 let circle = document.createElement('div');
                 circle.classList.add('circle', 'moves');
+                if (moveCount > totalMoves) {
+                    circle.style.backgroundColor = 'red';
+                }
                 movesContainer.appendChild(circle);
 
-                // Remove drop target class
                 target.classList.remove('drop-target');
 
-                // Play move sound
                 moveSound.play();
 
                 checkWin();
@@ -290,18 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
         moveCount = lastState.moveCount;
         movesCounter.textContent = moveCount;
 
-        // Remove the last move indicator circle
         if (movesContainer.lastChild) {
             movesContainer.removeChild(movesContainer.lastChild);
         }
 
-        // Check and update the visual status of the cells
-        checkWin(true); // Call checkWin with a parameter to indicate that this is an undo action
+        if (moveCount <= totalMoves) {
+            movesContainer.querySelectorAll('.circle.moves').forEach(circle => {
+                circle.style.backgroundColor = '#ffeb3b';
+            });
+        }
 
-        // Remove the error message if present
+        checkWin(true);
+
         if (message && moveCount <= totalMoves) {
             message.textContent = '';
-            gameOver = false; // Permette ulteriori mosse
+            gameOver = false;
         }
     }
 
@@ -314,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cell1 = cells[i * 3];
             const cell2 = cells[i * 3 + 1];
             const cell3 = cells[i * 3 + 2];
-            
+
             if (values[i * 3] + values[i * 3 + 1] === values[i * 3 + 2]) {
                 cell1.classList.add('correct');
                 cell2.classList.add('correct');
@@ -337,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nextGameButton) nextGameButton.style.display = 'block';
                 }, 1000);
 
-                // Play win sound
                 winSound.play();
 
                 gamesData.push({
@@ -348,21 +342,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 gameIndex++;
                 if (gameIndex < MAX_GAMES) {
-                    setTimeout(startGame, 1000); // Start next game after 1 second
+                    setTimeout(startGame, 1000);
                 } else {
                     showSummary();
                 }
             }
         } else if (!isUndo && moveCount > totalMoves) {
-            // Se il giocatore ha superato il numero minimo di mosse, partita persa
-            gameOver = true; // Impedisce ulteriori mosse
+            gameOver = true;
             if (message) message.textContent = 'Numero massimo di mosse superato. Annulla le ultime mosse e riprova.';
-            loseSound.play(); // Suono per partita persa
+            loseSound.play();
         }
     }
 
     function startTimer() {
-        let timeRemaining = 120; // 2 minuti in secondi
+        let timeRemaining = 120;
 
         timerInterval = setInterval(() => {
             timeRemaining--;
@@ -374,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(timerInterval);
                 alert('Tempo scaduto!');
 
-                // Play timeout sound
                 timeoutSound.play();
             }
         }, 1000);
@@ -437,11 +429,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (summary) summary.innerHTML = summaryHtml;
     }
 
-    // Disable scrolling on touch devices
     document.body.addEventListener('touchmove', (e) => {
         e.preventDefault();
     }, { passive: false });
 
-    // Start the first game
     startGame();
 });
